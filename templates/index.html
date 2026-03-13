@@ -1,0 +1,451 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <meta charset="UTF-8">
+    <title>DynoHost - Minecraft Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: "JetBrains Mono", monospace;
+            background: #0f172a;
+            color: white;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: #1e293b;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .brand {
+            font-weight: bold;
+            font-size: 20px;
+            color: white;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-box {
+            padding: 10px 20px;
+            background: #2563eb;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.5s ease;
+            font-weight: 500;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        .nav-box:hover {
+            background: #3b82f6;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+        }
+
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .console {
+            flex: 3;
+            display: flex;
+            flex-direction: column;
+            padding-left: 20px;
+            padding-right: 20px;
+            padding-bottom: 0px;
+            gap: 10px;
+            height: 100%;
+        }
+        #consoleCommand {
+            margin-top: 0px;
+            width: 100%;
+            background: #020617;
+            border: 1px solid #334155;
+            color: white;
+            padding: 12px;
+            border-radius: 10px;
+            outline: none;
+            caret-color: lime;
+            font-family: "JetBrains Mono", monospace;
+            box-sizing: border-box;
+        }
+
+        #consoleOutput {
+            flex: 1;
+            background: #020617;
+            padding: 15px;
+            border-radius: 12px;
+            overflow-y: auto;
+            font-size: 14px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        #consoleCommand {
+            width: 100%;
+            background: #020617;
+            border: 1px solid #334155;
+            color: white;
+            padding: 12px;
+            border-radius: 10px;
+            outline: none;
+            caret-color: lime;
+            font-family: "JetBrains Mono", monospace;
+            box-sizing: border-box;
+        }
+
+        .warn {
+            color: #facc15;
+        }
+
+        .error {
+            color: #ef4444;
+        }
+
+        .info {
+            color: #3b82f6;
+        }
+
+        .controls {
+            flex: 1;
+            background: #1e293b;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            box-shadow: -4px 0 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .controls h2 {
+            text-align: center;
+            margin: 0 0 10px 0;
+            font-size: 22px;
+        }
+
+        button.start,
+        button.stop,
+        button.kill {
+            padding: 15px 0;
+            font-size: 20px;
+            font-weight: bold;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        button.start {
+            background: #22c55e;
+            color: white;
+        }
+
+        button.start:hover {
+            background: #4ade80;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.6);
+        }
+
+        button.stop {
+            background: #ef4444;
+            color: white;
+        }
+
+        button.stop:hover {
+            background: #f87171;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.6);
+        }
+
+        button.kill {
+            background: #991b1b;
+            color: white;
+        }
+
+        button.kill:hover {
+            background: #ef4444;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.6);
+        }
+
+        .status {
+            padding: 20px;
+            background: #020617;
+            border-radius: 16px;
+            text-align: center;
+            font-size: 18px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .status span {
+            font-weight: bold;
+            margin-left: 5px;
+        }
+
+        .footer {
+            padding: 10px;
+            text-align: center;
+            font-size: 12px;
+            color: #94a3b8;
+        }
+        .bar {
+            width: 100%;
+            height: 14px;
+            background: #334155;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .barFill {
+            height: 100%;
+            width: 0%;
+            background: #3b82f6;
+            transition: width 0.5s ease;
+        }
+    </style>
+
+</head>
+
+<body>
+
+<header>
+    <div class="brand">DynoHost</div>
+
+    <div class="nav-buttons">
+        <div class="nav-box" onclick="goToConsole()">Console</div>
+        <div class="nav-box" onclick="goToFiles()">Files</div>
+    </div>
+</header>
+
+<div class="container">
+
+    <div class="console">
+        <pre id="consoleOutput" class="empty"></pre>
+        <input id="consoleCommand" type="text" placeholder="Type command...">
+    </div>
+
+    <div class="controls">
+
+        <h2>Controls</h2>
+
+        <button class="start" onclick="startServer()">START SERVER</button>
+
+        <button class="stop" onclick="stopServer()">STOP SERVER</button>
+
+        <!-- NEW BUTTON -->
+        <button class="kill" onclick="killServer()">KILL SERVER</button>
+
+        <div class="status">
+
+            Status: <span id="status">Offline</span><br>
+            Uptime: <span id="uptime">00:00:00</span>
+
+            <br><br>
+
+            CPU Usage
+            <div class="bar">
+                <div id="cpuBar" class="barFill"></div>
+            </div>
+            <span id="cpuText">0%</span>
+
+            <br>
+
+            RAM Usage
+            <div class="bar">
+                <div id="ramBar" class="barFill"></div>
+            </div>
+            <span id="ramText">0 / 8 GB</span>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="footer">
+    Owner: RDX - lostsoul_error |
+    <a href="https://github.com/LostSoul-error" style="color:#3b82f6;">GitHub Link</a>
+</div>
+
+<script>
+
+let startTime = null;
+
+async function updateConsole() {
+
+    try {
+
+        const r = await fetch("/logs");
+        const data = await r.text();
+
+        const lines = data.split("<br>");
+        const box = document.getElementById("consoleOutput");
+
+        const isAtBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 10;
+
+        box.innerHTML = "";
+
+        if (lines.length === 0 || (lines.length === 1 && lines[0] === "")) {
+            box.classList.add("empty");
+        } else {
+
+            box.classList.remove("empty");
+
+            for (let line of lines) {
+
+                if (!line) continue;
+
+                const div = document.createElement("div");
+                div.innerHTML = line;
+                box.appendChild(div);
+            }
+
+            if (isAtBottom) box.scrollTop = box.scrollHeight;
+        }
+
+    } catch (e) {
+
+        console.log(e);
+    }
+}
+
+async function updateStatus() {
+
+    try {
+
+        const r = await fetch("/status");
+        const data = await r.text();
+
+        const [s, start] = data.split("|");
+
+        const el = document.getElementById("status");
+        const upEl = document.getElementById("uptime");
+
+        el.innerText = s;
+
+        el.style.color =
+            s === "ONLINE" ? "lime" :
+            s === "OFFLINE" ? "red" :
+            "orange";
+
+        if (s === "ONLINE") {
+
+            if (startTime === null && start) {
+
+                startTime = new Date(parseFloat(start) * 1000);
+            }
+
+        } else {
+
+            startTime = null;
+            upEl.innerText = "00:00:00";
+        }
+
+        if (startTime) {
+
+            const diff = new Date() - startTime;
+
+            const h = String(Math.floor(diff / 3600000)).padStart(2, '0');
+            const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
+            const sec = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
+
+            upEl.innerText = `${h}:${m}:${sec}`;
+        }
+
+    } catch (e) {
+
+        console.log(e);
+    }
+}
+
+async function startServer() {
+    await fetch("/start", { method: "POST" });
+}
+
+async function stopServer() {
+    await fetch("/stop", { method: "POST" });
+}
+
+async function killServer() {
+    await fetch("/kill", { method: "POST" });
+}
+
+document.getElementById("consoleCommand").addEventListener("keydown", async function (e) {
+
+    if (e.key === "Enter") {
+
+        const cmd = this.value.trim();
+
+        if (!cmd) return;
+
+        try {
+
+            await fetch("/command", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ command: cmd })
+            });
+
+            this.value = "";
+
+        } catch (err) {
+
+            console.log(err);
+        }
+    }
+});
+
+function goToFiles() {
+    window.location.href = "/files";
+}
+
+function goToConsole() {
+    window.location.href = "/";
+}
+async function updateUsage() {
+
+    try {
+
+        const r = await fetch("/usage");
+        const data = await r.json();
+
+        const cpu = data.cpu;
+        const ram = data.ram;
+        const total = data.ram_total;
+
+        document.getElementById("cpuText").innerText = cpu + "%";
+        document.getElementById("ramText").innerText = ram + " / " + total + " GB";
+
+        document.getElementById("cpuBar").style.width = cpu + "%";
+
+        const ramPercent = (ram / total) * 100;
+        document.getElementById("ramBar").style.width = ramPercent + "%";
+
+    } catch(e) {
+
+        console.log(e);
+    }
+}
+
+setInterval(updateConsole, 400);
+setInterval(updateStatus, 1000);
+setInterval(updateUsage, 100);
+
+</script>
+
+</body>
+</html>
+

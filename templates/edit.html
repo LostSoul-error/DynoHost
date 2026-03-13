@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>DynoHost - Edit {{ filename }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <!-- CodeMirror CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/codemirror.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: "JetBrains Mono", monospace;
+            background: #0f172a;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        header {
+            background: #1e293b;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            flex-shrink: 0;
+        }
+
+        .brand {
+            font-weight: bold;
+            font-size: 20px;
+            color: white;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-box {
+            padding: 10px 20px;
+            background: #2563eb;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.5s ease;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .nav-box:hover {
+            background: #3b82f6;
+        }
+
+        #editor-container {
+            flex: 1; /* fills remaining space */
+            display: flex;
+            flex-direction: column;
+            background: #020617;
+        }
+
+        .CodeMirror {
+            flex: 1; /* fill container vertically */
+            background: #020617;
+            color: white;
+            font-family: "JetBrains Mono", monospace;
+            font-size: 14px;
+        }
+
+        .CodeMirror-cursor {
+            border-left: 2px solid lime !important;
+        }
+
+        .save-btn {
+            background: #22c55e;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 10px;
+            flex-shrink: 0;
+        }
+
+        .save-btn:hover {
+            background: #4ade80;
+        }
+
+        .footer {
+            padding: 10px;
+            text-align: center;
+            font-size: 12px;
+            color: #94a3b8;
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="brand">DynoHost - Editing {{ filename }}</div>
+        <div class="nav-buttons">
+            <div class="nav-box" onclick="goToFiles()">Files</div>
+            <div class="nav-box" onclick="goToConsole()">Console</div>
+        </div>
+    </header>
+
+    <div id="editor-container">
+        <textarea id="code">{{ content }}</textarea>
+    </div>
+
+    <button class="save-btn" onclick="saveFile()">Save</button>
+
+    <div class="footer">Owner: RDX - lostsoul_error | <a href="https://github.com/LostSoul-error"
+            style="color:#3b82f6;">GitHub Link</a></div>
+
+    <!-- CodeMirror JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/mode/javascript/javascript.min.js"></script>
+    <script>
+        // Initialize editor
+        const editor = CodeMirror.fromTextArea(document.getElementById('code'), {
+            lineNumbers: true,
+            mode: 'javascript',
+            theme: 'default',
+            lineWrapping: true,
+            indentUnit: 4,
+        });
+
+        // Ensure CodeMirror fills the container
+        editor.getWrapperElement().style.flex = '1';
+        editor.getWrapperElement().style.height = '100%';
+
+        function saveFile() {
+            fetch("/save/{{ filename }}", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ content: editor.getValue() })
+            }).then(res => res.json()).then(data => {
+                if (data.status === "ok") alert("Saved!");
+            });
+        }
+
+        function goToFiles() { window.location.href = "/files"; }
+        function goToConsole() { window.location.href = "/"; }
+    </script>
+
+</body>
+
+</html>

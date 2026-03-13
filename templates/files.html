@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <meta charset="UTF-8">
+    <title>DynoHost - Server Files</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            font-family: "JetBrains Mono", monospace;
+            background: #0f172a;    
+            color: white;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        header {
+            background: #1e293b;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .brand {
+            font-weight: bold;
+            font-size: 20px;
+            color: white;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-box {
+            padding: 10px 20px;
+            background: #2563eb;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.5s ease;
+            font-weight: 500;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        .nav-box:hover {
+            background: #3b82f6;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+        }
+
+        .container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .file-row {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #2c3a4a;
+            cursor: pointer;
+            transition: all 0.4s ease;
+        }
+
+        .file-row:hover {
+            background: #2563eb;
+            transform: translateX(3px);
+        }
+
+        .icon {
+            width: 30px;
+            text-align: center;
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        .name {
+            flex: 1;
+            word-break: break-word;
+        }
+
+        .footer {
+            padding: 10px;
+            text-align: center;
+            font-size: 12px;
+            color: #94a3b8;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="brand">DynoHost</div>
+        <div class="nav-buttons">
+            <div class="nav-box" onclick="goToConsole()">Console</div>
+            <div class="nav-box" onclick="goToFiles()">Files</div>
+        </div>
+    </header>
+
+    <div class="container">
+        {% for entry in files %}
+        <div class="file-row" data-name="{{ entry.name }}" data-isdir="{{ '1' if entry.is_dir else '0' }}">
+            <div class="icon">{% if entry.is_dir %}📁{% else %}📄{% endif %}</div>
+            <div class="name">{{ entry.name }}</div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="footer">Owner: RDX - lostsoul_error | <a href="https://github.com/LostSoul-error"
+            style="color:#3b82f6;">GitHub Link</a></div>
+
+    <script>
+        document.querySelectorAll(".file-row").forEach(row => {
+            row.addEventListener("click", () => {
+                const name = row.dataset.name;
+                const isDir = row.dataset.isdir === '1';
+                const currentPath = "{{ current_path|default('') }}";
+                const fullPath = currentPath ? currentPath + "/" + name : name;
+                if (isDir) {
+                    // Navigate into directory
+                    window.location.href = "/files/" + encodeURIComponent(fullPath);
+                } else {
+                    // Open in editor instead of downloading
+                    window.location.href = "/edit/" + encodeURIComponent(fullPath);
+                }
+            });
+        });
+
+        function goToFiles() { window.location.href = "/files"; }
+        function goToConsole() { window.location.href = "/"; }
+    </script>
+
+</body>
+
+</html>
