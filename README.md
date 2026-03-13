@@ -1,4 +1,3 @@
-```
 ![DynoHost Banner](https://placehold.co/1000x250?text=DynoHost+Minecraft+Panel&bg=0f172a&fg=ffffff)
 
 # 🎮 DynoHost v1 – Your Local Minecraft Server Control Panel
@@ -322,4 +321,3 @@ MIT License – Free to use, modify, and share.
 
 **DynoHost v1 – Make hosting Minecraft locally fun, easy, and powerful!**
 
-```
