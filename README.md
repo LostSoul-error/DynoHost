@@ -10,7 +10,7 @@ DynoHost v1 is a **local web-based Minecraft server control panel**. Start, stop
 
 With DynoHost, you only need to **run your server once using CMD**, place the server files correctly, and from the next time onward, everything is **managed via this panel**.
 
-> This project is **open-source**, made with love 💖, late-night learning sessions in Flask 🐍, and yes… AI helped me along the way 😅.
+
 
 ---
 
@@ -29,7 +29,7 @@ With DynoHost, you only need to **run your server once using CMD**, place the se
 
 1. **Clone the repository**:
 ```bash
-git clone https://github.com/YourUsername/DynoHost.git
+git clone https://github.com/LostSoul-error/DynoHost.git
 cd DynoHost
 
 ```
